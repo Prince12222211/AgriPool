@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AgriPool{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Welcome, {{ user.get_full_name|default:user.username }}</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if user.farmer_profile %}
+                <a href="{% url 'fertilizer:create_land_parcel' %}" class="btn btn-success">Add Land Parcel</a>
+                <a href="{% url 'transport:create_transport_request' %}" class="btn btn-primary">Request Transport</a>
+            {% elif user.transporter_profile %}
+                <a href="{% url 'transport:create_transport_offer' %}" class="btn btn-primary">Create Transport Offer</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if user.farmer_profile %}
+        <!-- Farmer Dashboard -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">My Land Parcels</h5>
+                    </div>
+                <div class="card-body">
+                    {% if land_parcels %}
+                        {% for parcel in land_parcels %}
+                        <div class="mb-3">
+                            <h6><a href="{% url 'fertilizer:land_parcel_detail' parcel.id %}">{{ parcel.parcel_name }}</a></h6>
+                            <p class="mb-1">Area: {{ parcel.area }} acres</p>
+                            <p class="mb-1">Soil: {{ parcel.get_soil_type_display }}</p>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'fertilizer:crop_recommendations' parcel.id %}" class="btn btn-outline-primary">Crop Recommendations</a>
+                                <a href="{% url 'fertilizer:create_fertilizer_plan' parcel.id %}" class="btn btn-outline-success">New Fertilizer Plan</a>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No land parcels added yet.</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'fertilizer:land_parcel_list' %}" class="btn btn-sm btn-primary">View All Parcels</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Transport Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if transport_requests %}
+                        {% for request in transport_requests %}
+                        <div class="mb-3">
+                            <h6><a href="{% url 'transport:transport_detail' request.id %}">{{ request.crop_type }}</a></h6>
+                            <p class="mb-1">From: {{ request.pickup_village }} To: {{ request.destination_market }}</p>
+                            <p class="mb-1">Status: <span class="badge badge-{{ request.status }}">{{ request.get_status_display }}</span></p>
+                            {% if request.matches.exists %}
+                                <small>{{ request.matches.count }} transport offers available</small>
+                            {% endif %}
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No transport requests yet.</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'transport:my_transport_requests' %}" class="btn btn-sm btn-primary">View All Requests</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Active Matches</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_matches %}
+                        {% for match in active_matches %}
+                        <div class="mb-3">
+                            <h6>{{ match.transport_request.crop_type }}</h6>
+                            <p class="mb-1">Transporter: {{ match.transport_offer.transporter.username }}</p>
+                            <p class="mb-1">Cost: ₹{{ match.total_cost }}</p>
+                            <p class="mb-2">Status: <span class="badge badge-{{ match.status }}">{{ match.get_status_display }}</span></p>
+                            {% if match.status == 'proposed' %}
+                                <a href="{% url 'transport:accept_transport_match' match.id %}" class="btn btn-sm btn-success">Accept Offer</a>
+                            {% endif %}
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No active transport matches.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if recent_crops %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Crops</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for crop in recent_crops %}
+                            <a href="{% url 'fertilizer:crop_detail' crop.id %}" class="list-group-item list-group-item-action">
+                                {{ crop.name }}
+                                <small class="text-muted d-block">Season: {{ crop.get_season_display }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+        {% elif user.transporter_profile %}
+        <!-- Transporter Dashboard -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">My Transport Offers</h5>
+                    </div>
+                <div class="card-body">
+                    {% if transport_offers %}
+                        {% for offer in transport_offers %}
+                        <div class="mb-3">
+                            <h6>{{ offer.get_vehicle_type_display }}</h6>
+                            <p class="mb-1">Capacity: {{ offer.capacity }} tons</p>
+                            <p class="mb-1">Current Location: {{ offer.current_district }}</p>
+                            <p class="mb-1">Status: <span class="badge badge-{{ offer.status }}">{{ offer.get_status_display }}</span></p>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No transport offers created yet.</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'transport:my_transport_offers' %}" class="btn btn-sm btn-primary">View All Offers</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Active Matches</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_matches %}
+                        {% for match in active_matches %}
+                        <div class="mb-3">
+                            <h6>{{ match.transport_request.crop_type }}</h6>
+                            <p class="mb-1">Farmer: {{ match.transport_request.farmer.username }}</p>
+                            <p class="mb-1">Route: {{ match.transport_request.pickup_village }} to {{ match.transport_request.destination_market }}</p>
+                            <p class="mb-1">Cost: ₹{{ match.total_cost }}</p>
+                            <p class="mb-2">Status: <span class="badge badge-{{ match.status }}">{{ match.get_status_display }}</span></p>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No active transport matches.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Performance Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center mb-3">
+                        <div class="col">
+                            <h6 class="mb-0">Rating</h6>
+                        </div>
+                        <div class="col-auto">
+                            <span class="h4">{{ rating|floatformat:1 }}/5.0</span>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col">
+                            <h6 class="mb-0">Total Trips</h6>
+                        </div>
+                        <div class="col-auto">
+                            <span class="h4">{{ total_trips }}</span>
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="mb-0">Account Status</h6>
+                        </div>
+                        <div class="col-auto">
+                            {% if user.transporter_profile.verified %}
+                                <span class="badge badge-success">Verified</span>
+                            {% else %}
+                                <span class="badge badge-warning">Pending Verification</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+    
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-value">{{ transport_requests.count }}</div>
+                        <div class="stat-label">Transport Requests</div>
+                    </div>
+                    <i class="fas fa-truck stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-value">{{ land_parcels.count }}</div>
+                        <div class="stat-label">Land Parcels</div>
+                    </div>
+                    <i class="fas fa-map stat-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-value">{{ fertilizer_plans.count }}</div>
+                        <div class="stat-label">Fertilizer Plans</div>
+                    </div>
+                    <i class="fas fa-leaf stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3">Quick Actions</h4>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'create_transport_request' %}" class="btn btn-primary w-100 py-3">
+                <i class="fas fa-plus-circle fa-2x d-block mb-2"></i>
+                New Transport Request
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'transport_list' %}" class="btn btn-outline-primary w-100 py-3">
+                <i class="fas fa-search fa-2x d-block mb-2"></i>
+                Browse Requests
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'create_land_parcel' %}" class="btn btn-success w-100 py-3">
+                <i class="fas fa-plus-circle fa-2x d-block mb-2"></i>
+                Add Land Parcel
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'land_parcel_list' %}" class="btn btn-outline-success w-100 py-3">
+                <i class="fas fa-leaf fa-2x d-block mb-2"></i>
+                View My Parcels
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Recent Transport Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if transport_requests %}
+                        <div class="list-group list-group-flush">
+                            {% for request in transport_requests %}
+                                <a href="{% url 'transport:transport_detail' request.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ request.crop_type }}</h6>
+                                            <small class="text-muted">{{ request.pickup_village }} → {{ request.destination_market }}</small>
+                                        </div>
+                                        <span class="badge bg-info">{{ request.status }}</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">No transport requests yet.</p>
+                        <a href="{% url 'transport:create_transport_request' %}" class="btn btn-primary btn-sm">Create your first request</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-leaf me-2"></i>Recent Fertilizer Plans</h5>
+                </div>
+                <div class="card-body">
+                    {% if fertilizer_plans %}
+                        <div class="list-group list-group-flush">
+                            {% for plan in fertilizer_plans %}
+                                <a href="{% url 'fertilizer:plan_detail' plan.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ plan.crop.name }} - {{ plan.land_parcel.parcel_name }}</h6>
+                                            <small class="text-muted">{{ plan.season|title }} {{ plan.year }}</small>
+                                        </div>
+                                        <span class="badge bg-success">₹{{ plan.estimated_fertilizer_cost }}</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">No fertilizer plans yet.</p>
+                        <a href="{% url 'fertilizer:create_land_parcel' %}" class="btn btn-success btn-sm">Add a land parcel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

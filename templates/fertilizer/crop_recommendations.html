@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Crop Recommendations for {{ land_parcel.parcel_name }}</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Land Parcel Details</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Area:</strong> {{ land_parcel.area }} acres</p>
+                    <p><strong>Soil Type:</strong> {{ land_parcel.get_soil_type_display }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Soil pH:</strong> {{ land_parcel.soil_ph|default:"Not available" }}</p>
+                    <p><strong>Irrigation:</strong> {{ land_parcel.get_irrigation_type_display }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Location:</strong> {{ land_parcel.village }}, {{ land_parcel.district }}</p>
+                    <p><strong>Annual Rainfall:</strong> {{ land_parcel.rainfall_mm|default:"Not available" }} mm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h4>Recommended Crops for {{ season }} Season</h4>
+        </div>
+        <div class="col-auto">
+            <form method="get" class="form-inline">
+                <select name="season" class="form-control mr-2" onchange="this.form.submit()">
+                    <option value="kharif" {% if season == 'kharif' %}selected{% endif %}>Kharif (Monsoon)</option>
+                    <option value="rabi" {% if season == 'rabi' %}selected{% endif %}>Rabi (Winter)</option>
+                    <option value="zaid" {% if season == 'zaid' %}selected{% endif %}>Zaid (Summer)</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    {% for recommendation in recommendations %}
+    <div class="card mb-3 {% if forloop.counter <= 3 %}border-success{% endif %}">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    {% if recommendation.crop.image %}
+                        <img src="{{ recommendation.crop.image.url }}" class="img-fluid rounded" alt="{{ recommendation.crop.name }}">
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    <h5 class="card-title">{{ recommendation.crop.name }}
+                        <span class="badge {% if recommendation.suitability_score > 0.8 %}badge-success{% elif recommendation.suitability_score > 0.6 %}badge-info{% else %}badge-warning{% endif %}">
+                            Suitability: {{ recommendation.suitability_score|floatformat:2 }}
+                        </span>
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Estimated Yield:</strong> {{ recommendation.estimated_yield_per_acre }} quintals/acre</p>
+                            <p><strong>Total Yield:</strong> {{ recommendation.total_estimated_yield }} quintals</p>
+                            <p><strong>Market Price:</strong> ₹{{ recommendation.market_price }}/quintal</p>
+                            <p><strong>Est. Revenue:</strong> ₹{{ recommendation.estimated_revenue|floatformat:0 }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Growing Period:</strong> {{ recommendation.growing_duration }} days</p>
+                            <p><strong>Water Requirement:</strong> {{ recommendation.water_requirement }}</p>
+                            {% for req in recommendation.key_requirements %}
+                                <p><small>{{ req }}</small></p>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-primary btn-sm mb-2" data-toggle="modal" data-target="#cropDetails{{ recommendation.crop.id }}">View Details</a>
+                            <a href="{% url 'fertilizer:create_plan' land_parcel.id %}?crop={{ recommendation.crop.id }}&season={{ season }}" 
+                               class="btn btn-success btn-sm">Create Fertilizer Plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Crop Details Modal -->
+    <div class="modal fade" id="cropDetails{{ recommendation.crop.id }}" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ recommendation.crop.name }} - Detailed Information</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Description</h6>
+                            <p>{{ recommendation.crop.description }}</p>
+                            
+                            <h6>Planting Method</h6>
+                            <p>{{ recommendation.crop.planting_method }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Irrigation Schedule</h6>
+                            <p>{{ recommendation.crop.irrigation_schedule }}</p>
+                            
+                            <h6>Common Pests and Diseases</h6>
+                            <p>{{ recommendation.crop.pest_diseases }}</p>
+                            
+                            <h6>Storage Information</h6>
+                            <p>{{ recommendation.crop.storage_info }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">
+        No crop recommendations available for the selected season.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

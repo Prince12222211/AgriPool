@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Fertilizer Plan - AgriPool{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-3"><i class="fas fa-leaf me-2"></i>{{ plan.crop.name }} - {{ plan.season|title }} {{ plan.year }}</h3>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header">Recommendations (per parcel)</div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Nitrogen (N): <strong>{{ plan.nitrogen_kg }} kg</strong></li>
+            <li class="list-group-item">Phosphorus (P): <strong>{{ plan.phosphorus_kg }} kg</strong></li>
+            <li class="list-group-item">Potassium (K): <strong>{{ plan.potassium_kg }} kg</strong></li>
+            <li class="list-group-item">Organic Manure: <strong>{{ plan.organic_manure_kg }} kg</strong></li>
+            <li class="list-group-item">Compost: <strong>{{ plan.compost_kg }} kg</strong></li>
+            <li class="list-group-item">Zinc: <strong>{{ plan.zinc_kg }} kg</strong></li>
+            <li class="list-group-item">Boron: <strong>{{ plan.boron_kg }} kg</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header">Estimates</div>
+        <div class="card-body">
+          {% if plan.target_yield %}
+          <p><strong>Target Yield (per acre):</strong> {{ plan.target_yield }} q/acre</p>
+          {% endif %}
+          <p><strong>Estimated Fertilizer Cost:</strong> ₹{{ plan.estimated_fertilizer_cost }}</p>
+          <p><strong>Estimated Yield (parcel):</strong> {{ plan.estimated_yield }} quintals</p>
+          <p><strong>Estimated Revenue:</strong> ₹{{ plan.estimated_revenue }}</p>
+          <hr/>
+          <p class="mb-1"><strong>Application Schedule</strong></p>
+          <pre class="mb-0">{{ plan.application_schedule }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% if plan.additional_notes %}
+  <div class="card mb-3">
+    <div class="card-header">Additional Notes</div>
+    <div class="card-body">{{ plan.additional_notes }}</div>
+  </div>
+  {% endif %}
+  <a href="{% url 'land_parcel_detail' plan.land_parcel.pk %}" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+</div>
+{% endblock %}

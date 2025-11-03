@@ -1,0 +1,56 @@
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 1rem 1.25rem;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+.bg-proposed { background-color: #ffc107; }
+.bg-accepted { background-color: #28a745; }
+.bg-completed { background-color: #6c757d; }
+.bg-cancelled { background-color: #dc3545; }
+
+.list-group-item-action:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-group-sm > .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group-sm > .btn:last-child {
+    margin-right: 0;
+}

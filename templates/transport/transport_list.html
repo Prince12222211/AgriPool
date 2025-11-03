@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Transport Requests - AgriPool{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="fas fa-truck me-2"></i>Open Transport Requests</h3>
+    <a href="{% url 'transport:create_transport_request' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>New Request</a>
+  </div>
+
+  {% if requests %}
+  <div class="row g-3">
+    {% for r in requests %}
+    <div class="col-md-6">
+      <div class="card transport-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <h5 class="card-title mb-1">{{ r.crop_type }} ({{ r.quantity }} qt)</h5>
+            <span class="badge status-{{ r.status|slugify }}">{{ r.status|title }}</span>
+          </div>
+          <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-1"></i>{{ r.pickup_village }} → {{ r.destination_market }}</p>
+          <p class="mb-2"><i class="fas fa-calendar-alt me-1"></i>{{ r.preferred_date }}</p>
+          <a href="{% url 'transport:transport_detail' r.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <p class="text-muted mb-3">No open transport requests right now.</p>
+        <a href="{% url 'transport:create_transport_request' %}" class="btn btn-primary">Create one</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

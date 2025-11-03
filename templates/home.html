@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="hero-title">Welcome to AgriPool</h1>
+        <p class="hero-subtitle">Empowering Farmers with Smart Transport Sharing and Precision Fertilizer Planning</p>
+        {% if not user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg me-3">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                </a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+            </div>
+        {% else %}
+            <a href="{% url 'accounts:dashboard' %}" class="btn btn-light btn-lg">
+                <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h2 class="fw-bold mb-3">Our Services</h2>
+            <p class="text-muted">Comprehensive solutions for modern farming</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-6 fade-in">
+            <div class="card feature-card">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck-moving"></i>
+                    </div>
+                    <h3 class="mb-3">Transport Sharing</h3>
+                    <p class="text-muted mb-4">
+                        Share transportation costs with fellow farmers. Post your produce transport needs 
+                        and connect with transporters offering competitive rates. Reduce costs and increase profits!
+                    </p>
+                    <a href="{% url 'transport:transport_list' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>Explore Transport
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 fade-in" style="animation-delay: 0.2s;">
+            <div class="card feature-card">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h3 class="mb-3">Fertilizer Planning</h3>
+                    <p class="text-muted mb-4">
+                        Get customized, land-parcel-specific fertilizer recommendations. Optimize input usage, 
+                        reduce costs, and maximize returns with precision agriculture planning.
+                    </p>
+                    <a href="{% url 'fertilizer:land_parcel_list' %}" class="btn btn-success">
+                        <i class="fas fa-arrow-right me-2"></i>Create Plan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="container my-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h2 class="fw-bold mb-3">How It Works</h2>
+            <p class="text-muted">Simple steps to get started</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-3 text-center">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <h3 class="mb-0">1</h3>
+                    </div>
+                    <h5>Register</h5>
+                    <p class="text-muted">Create your free account</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <h3 class="mb-0">2</h3>
+                    </div>
+                    <h5>Add Details</h5>
+                    <p class="text-muted">Enter your farm and crop information</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="rounded-circle bg-info text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <h3 class="mb-0">3</h3>
+                    </div>
+                    <h5>Get Recommendations</h5>
+                    <p class="text-muted">Receive customized plans</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 text-center">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="rounded-circle bg-warning text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <h3 class="mb-0">4</h3>
+                    </div>
+                    <h5>Maximize Returns</h5>
+                    <p class="text-muted">Optimize costs and increase profits</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+{% if not user.is_authenticated %}
+<div class="container my-5">
+    <div class="card bg-success text-white">
+        <div class="card-body text-center py-5">
+            <h2 class="mb-3">Ready to Transform Your Farming?</h2>
+            <p class="mb-4">Join thousands of farmers already benefiting from AgriPool</p>
+            <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Join Now - It's Free!
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

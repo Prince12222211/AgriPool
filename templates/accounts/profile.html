@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - AgriPool{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="profile-header text-center">
+                    <h3><i class="fas fa-user-circle me-2"></i>My Profile</h3>
+                    <p class="mb-0">{{ user.email }}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" class="form-control" name="phone_number" value="{{ profile.phone_number }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">PIN Code</label>
+                                <input type="text" class="form-control" name="pin_code" value="{{ profile.pin_code }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" name="address" rows="2">{{ profile.address }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Village</label>
+                                <input type="text" class="form-control" name="village" value="{{ profile.village }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">District</label>
+                                <input type="text" class="form-control" name="district" value="{{ profile.district }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">State</label>
+                                <input type="text" class="form-control" name="state" value="{{ profile.state }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" name="profile_picture" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update Profile
+                        </button>
+                        <a href="{% url 'accounts:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

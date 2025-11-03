@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Transport Details - AgriPool{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="fas fa-truck me-2"></i>{{ transport_request.crop_type }} - {{ transport_request.quantity }} qt</h3>
+    <div class="d-flex gap-2">
+      {% if not is_owner %}
+      <a href="{% url 'transport:create_transport_offer' %}" class="btn btn-primary"><i class="fas fa-hand-holding-usd me-2"></i>Make Offer</a>
+      {% endif %}
+      <a href="{% url 'transport:transport_list' %}" class="btn btn-secondary">Back</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header">Request Details</div>
+        <div class="card-body">
+          <p><strong>Route:</strong> {{ transport_request.pickup_village }} → {{ transport_request.destination_market }}</p>
+          <p><strong>Pickup Location:</strong> {{ transport_request.pickup_location }}</p>
+          <p><strong>Pickup District:</strong> {{ transport_request.pickup_district }}</p>
+          <p><strong>Destination District:</strong> {{ transport_request.destination_district }}</p>
+          <p><strong>Preferred Date:</strong> {{ transport_request.preferred_date }}</p>
+          <p><strong>Flexible Dates:</strong> {{ transport_request.flexible_dates|yesno:'Yes,No' }}</p>
+          {% if transport_request.description %}
+          <p><strong>Description:</strong> {{ transport_request.description }}</p>
+          {% endif %}
+          <p><strong>Status:</strong> <span class="badge status-{{ transport_request.status|slugify }}">{{ transport_request.status|title }}</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header">Offers</div>
+        <div class="card-body">
+          {% if offers %}
+            <div class="list-group list-group-flush">
+              {% for offer in offers %}
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">{{ offer.vehicle_type }} ({{ offer.vehicle_capacity }} qt)</h6>
+                  <small class="text-muted">By {{ offer.transporter.username }} • ₹{{ offer.offered_price }}</small>
+                  {% if offer.message %}<p class="mb-0">{{ offer.message }}</p>{% endif %}
+                </div>
+                <div>
+                  {% if is_owner and not offer.is_accepted %}
+                    <a href="{% url 'transport:accept_match' offer.id %}" class="btn btn-success btn-sm">Accept</a>
+                  {% elif offer.is_accepted %}
+                    <span class="badge bg-success">Accepted</span>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted">No offers yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
