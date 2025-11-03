@@ -6,7 +6,9 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3><i class="fas fa-map me-2"></i>{{ parcel.parcel_name }}</h3>
-    <a href="{% url 'create_fertilizer_plan' parcel.pk %}" class="btn btn-success"><i class="fas fa-seedling me-2"></i>Create Plan</a>
+    <a href="{% url 'fertilizer:create_fertilizer_plan' parcel.pk %}" class="btn btn-success">
+      <i class="fas fa-seedling me-2"></i>Create Plan
+    </a>
   </div>
 
   <div class="row">
@@ -22,10 +24,13 @@
           {% if parcel.organic_carbon %}<p><strong>Organic Carbon:</strong> {{ parcel.organic_carbon }}%</p>{% endif %}
           {% if parcel.irrigation_type %}<p><strong>Irrigation:</strong> {{ parcel.irrigation_type|title }}</p>{% endif %}
           {% if parcel.rainfall_mm %}<p><strong>Annual Rainfall:</strong> {{ parcel.rainfall_mm }} mm</p>{% endif %}
-          <p><strong>N:</strong> {{ parcel.nitrogen_level|default:'-' }} | <strong>P:</strong> {{ parcel.phosphorus_level|default:'-' }} | <strong>K:</strong> {{ parcel.potassium_level|default:'-' }}</p>
+          <p><strong>N:</strong> {{ parcel.nitrogen_level|default:'-' }} | 
+             <strong>P:</strong> {{ parcel.phosphorus_level|default:'-' }} | 
+             <strong>K:</strong> {{ parcel.potassium_level|default:'-' }}</p>
         </div>
       </div>
     </div>
+
     <div class="col-md-7 mb-3">
       <div class="card h-100">
         <div class="card-header">Fertilizer Plans</div>
@@ -33,11 +38,13 @@
           {% if plans %}
           <div class="list-group list-group-flush">
             {% for plan in plans %}
-            <a class="list-group-item list-group-item-action" href="{% url 'fertilizer_plan_detail' plan.pk %}">
+            <a class="list-group-item list-group-item-action" href="{% url 'fertilizer:fertilizer_plan_detail' plan.pk %}">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
                   <h6 class="mb-1">{{ plan.crop.name }} - {{ plan.season|title }} {{ plan.year }}</h6>
-                  <small class="text-muted">N: {{ plan.nitrogen_kg }} kg | P: {{ plan.phosphorus_kg }} kg | K: {{ plan.potassium_kg }} kg</small>
+                  <small class="text-muted">
+                    N: {{ plan.nitrogen_kg }} kg | P: {{ plan.phosphorus_kg }} kg | K: {{ plan.potassium_kg }} kg
+                  </small>
                 </div>
                 <span class="badge bg-success">₹{{ plan.estimated_fertilizer_cost }}</span>
               </div>
@@ -51,6 +58,9 @@
       </div>
     </div>
   </div>
-  <a href="{% url 'land_parcel_list' %}" class="btn btn-secondary mt-2"><i class="fas fa-arrow-left me-2"></i>Back</a>
+
+  <a href="{% url 'fertilizer:land_parcel_list' %}" class="btn btn-secondary mt-2">
+    <i class="fas fa-arrow-left me-2"></i>Back
+  </a>
 </div>
 {% endblock %}
